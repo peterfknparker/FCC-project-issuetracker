@@ -1,6 +1,6 @@
 "use strict";
 const Issue = require("../models/Issue.js");
-const ObjectId = require("mongodb").ObjectId;
+const mongoose = require("mongoose");
 
 module.exports = function (app, dataBase) {
 	app
@@ -69,78 +69,100 @@ module.exports = function (app, dataBase) {
 
 		.put(function (req, res) {
 			let project = req.params.project;
+
+			let {
+				_id,
+				issue_title,
+				issue_text,
+				created_by,
+				assigned_to,
+				status_text,
+				open,
+			} = req.body;
 			let updatedIssue = {
 				updated_on: Date.now(),
-				open: req.body.open || true,
+				open: open || true,
 			};
 
-			if (req.body.issue_title) {
-				updatedIssue.issue_title = req.body.issue_title;
+			if (issue_title) {
+				updatedIssue.issue_title = issue_title;
 			}
-			if (req.body.issue_text) {
-				updatedIssue.issue_text = req.body.issue_text;
+			if (issue_text) {
+				updatedIssue.issue_text = issue_text;
 			}
-			if (req.body.created_by) {
-				updatedIssue.created_by = req.body.created_by;
+			if (created_by) {
+				updatedIssue.created_by = created_by;
 			}
-			if (req.body.assigned_to) {
-				updatedIssue.assigned_to = req.body.assigned_to;
+			if (assigned_to) {
+				updatedIssue.assigned_to = assigned_to;
 			}
-			if (req.body.status_text) {
-				updatedIssue.status_text = req.body.status_text;
+			if (status_text) {
+				updatedIssue.status_text = status_text;
 			}
 
 			// 7. When the PUT request sent to `/api/issues/{projectname}` does not include an \_id, the return value is `{ error: 'missing _id' }`.
 
-			if (!req.body._id) {
-				res.json({ error: "missing _id" });
+			console.log("idcheck", _id);
+			if (!_id) {
+				return res.json({ error: "missing _id" });
 			} else if (
-				!req.body.issue_title &&
-				!req.body.issue_text &&
-				!req.body.created_by &&
-				!req.body.assigned_to &&
-				!req.body.status_text &&
-				!req.body.open
+				!issue_title &&
+				!issue_text &&
+				!created_by &&
+				!assigned_to &&
+				!status_text &&
+				!open
 			) {
 				// 8. When the PUT request sent to `/api/issues/{projectname}` does not include update fields, the return value is `{ error: 'no update field(s) sent', '_id': _id }`. On any other error, the return value is `{ error: 'could not update', '_id': _id }`.
 
-				res.json({ error: "no update field(s) sent", _id: req.body._id });
+				return res.json({ error: "no update field(s) sent", _id: _id });
 			} else {
-				let id;
+				console.log("Step 1");
+				// let _checkId;
 				try {
-					id = mongoose.Types.ObjectId(req.body._id);
-				} catch (err) {
-					return res.json({ error: "could not update", _id: req.body._id });
-				}
+					_id = mongoose.Types.ObjectId(_id);
+					console.log(_id);
 
-				Issue.findByIdAndUpdate(
-					id,
-					updatedIssue,
-					{ new: true },
-					function (err, issue) {
-						if (err)
-							return res.json({ error: "could not update", _id: req.body._id });
-						// 6. You can send a PUT request to `/api/issues/{projectname}` with an \_id and one or more fields to update. On success, the updated_on field should be updated, and returned should be `{ result: 'successfully updated', '_id': _id }`.
-						res.json({ result: "successfully updated", _id: issue._id });
-					}
-				);
+					console.log(_id, updatedIssue);
+					Issue.findByIdAndUpdate(
+						_id,
+						updatedIssue,
+						{ new: true },
+						function (err, issue) {
+							if (err) return res.json({ error: "could not update", _id: _id });
+							// 6. You can send a PUT request to `/api/issues/{projectname}` with an \_id and one or more fields to update. On success, the updated_on field should be updated, and returned should be `{ result: 'successfully updated', '_id': _id }`.
+							return res.json({
+								result: "successfully updated",
+								_id: _id,
+							});
+						}
+					);
+				} catch (err) {
+					// return res.json({ error: "could not update", _id: _id });
+					console.log(err);
+					return res.json({ error: "could not update", _id: _id });
+				}
 			}
 		})
 
 		// 9. You can send a DELETE request to `/api/issues/{projectname}` with an \_id to delete an issue. If no \_id is sent, the return value is `{ error: 'missing _id' }`. On success, the return value is `{ result: 'successfully deleted', '_id': _id }`. On failure, the return value is `{ error: 'could not delete', '_id': _id }`.
 		.delete(function (req, res) {
 			let project = req.params.project;
-			if (!req.body._id) {
+			let { _id } = req.body;
+			if (!_id) {
 				res.json({ error: "missing _id" });
 			} else {
-				Issue.find(
-					{ project_name: project, _id: req.body._id },
-					function (err, issue) {
-						if (err)
-							return res.json({ error: "could not delete", _id: req.body._id });
-						res.json({ result: "successfully deleted", _id: req.body._id });
-					}
-				);
+				try {
+					_id = mongoose.Types.ObjectId(_id);
+
+					Issue.find(
+						{ project_name: project, _id: req.body._id },
+						function (err, issue) {
+							if (err) return res.json({ error: "could not delete", _id: _id });
+							res.json({ result: "successfully deleted", _id: _id });
+						}
+					);
+				} catch {}
 			}
 		});
 };
