@@ -106,7 +106,7 @@ module.exports = function (app, dataBase) {
 				try {
 					id = mongoose.Types.ObjectId(id);
 				} catch (err) {
-					return res.json({ error: "could not update", _id: id });
+					return res.json({ error: "could not update", _id: req.body._id });
 				}
 
 				res.json({ error: "no update field(s) sent", _id: req.body._id });
