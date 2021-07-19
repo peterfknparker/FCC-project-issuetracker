@@ -124,11 +124,14 @@ module.exports = function (app, dataBase) {
 			if (!req.body._id) {
 				res.json({ error: "missing _id" });
 			} else {
-				Issue.findByIdAndDelete(req.body._id, function (err, issue) {
-					if (err)
-						return res.json({ error: "could not delete", _id: req.body._id });
-					res.json({ result: "successfully deleted", _id: req.body._id });
-				});
+				Issue.find(
+					{ project_name: project, _id: req.body._id },
+					function (err, issue) {
+						if (err)
+							return res.json({ error: "could not delete", _id: req.body._id });
+						res.json({ result: "successfully deleted", _id: req.body._id });
+					}
+				);
 			}
 		});
 };
