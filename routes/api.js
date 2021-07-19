@@ -1,5 +1,6 @@
 "use strict";
 const Issue = require("../models/Issue.js");
+const ObjectId = require("mongodb").ObjectId;
 
 module.exports = function (app, dataBase) {
 	app
@@ -101,6 +102,12 @@ module.exports = function (app, dataBase) {
 				!req.body.open
 			) {
 				// 8. When the PUT request sent to `/api/issues/{projectname}` does not include update fields, the return value is `{ error: 'no update field(s) sent', '_id': _id }`. On any other error, the return value is `{ error: 'could not update', '_id': _id }`.
+
+				try {
+					id = mongoose.Types.ObjectId(id);
+				} catch (err) {
+					return res.json({ error: "could not update", _id: id });
+				}
 
 				res.json({ error: "no update field(s) sent", _id: req.body._id });
 			} else {
