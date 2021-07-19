@@ -1,115 +1,742 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Issue Tracker</title>
-    <link rel="icon" type="image/png" href="https://cdn.freecodecamp.org/universal/favicons/favicon-16x16.png" />
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/public/style.css">
-  </head>
-  <body>
-    <header>
-      <h1>
-        Issue Tracker
-      </h1>
-    </header>
-    <section style="margin: 0 50px;">
-      <h3>Example <code>GET</code> usage</h3>
-      <code>/api/issues/{project}</code><br>
-      <code>/api/issues/{project}?open=true&amp;assigned_to=Joe</code><br>
-      <h3>Example return</h3>
-      <pre>
-<code>[
-  { 
-    "_id": "5871dda29faedc3491ff93bb",
-    "issue_title": "Fix error in posting data",
-    "issue_text": "When we post data it has an error.",
-    "created_on": "2017-01-08T06:35:14.240Z",
-    "updated_on": "2017-01-08T06:35:14.240Z",
-    "created_by": "Joe",
-    "assigned_to": "Joe",
-    "open": true,
-    "status_text": "In QA"
-  },
-  ...
- ]
-</code>
-</pre>
-    </section>
-    <hr style='margin: 0 50px'>
-    <section id='testui' style='margin-left: 50px;'>
-      <h3>Examples</h3>
-      Go to <a href='/api/issues/apitest/'><code>/api/issues/apitest/</code></a>  project
-      <h2 style="text-align: left">API Tests</h2>
-      <h3>Submit issue on <i>apitest</i></h3>
-      <form id="testForm" class="border">
-        <input type="text" name="issue_title" placeholder="*Title" style="width: 100px" required=''><br>
-        <textarea type="text" name="issue_text" placeholder="*Text" style="width: 100px" required=''></textarea><br>
-        <input type="text" name="created_by" placeholder="*Created by" style="width: 100px" required=''><br>
-        <input type="text" name="assigned_to" placeholder="(opt)Assigned to" style="width: 100px"><br>
-        <input type="text" name="status_text" placeholder="(opt)Status text" style="width: 100px"><br>
-        <button type="submit">Submit Issue</button>
-      </form><br>
-      <h3>Update issue on <i>apitest</i> (Change any or all to update issue on the _id supplied)</h3>
-      <form id="testForm2" class="border">
-        <input type="text" name="_id" placeholder="*_id" style="width: 100px" required=''><br>
-        <input type="text" name="issue_title" placeholder="(opt)Title" style="width: 100px"><br>
-        <textarea type="text" name="issue_text" placeholder="(opt)Text" style="width: 100px"></textarea><br>
-        <input type="text" name="created_by" placeholder="(opt)Created by" style="width: 100px"><br>
-        <input type="text" name="assigned_to" placeholder="(opt)Assigned to" style="width: 100px"><br>
-        <input type="text" name="status_text" placeholder="(opt)Status text" style="width: 100px"><br>
-        <label><input type="checkbox" name="open" value="false"> Check to close issue</label><br>
-        <button type="submit">Submit Issue</button>
-      </form><br>
-      <h3>Delete issue on <i>apitest</i></h3>
-      <form id="testForm3" class="border">
-        <input type="text" name="_id" placeholder="_id" style="width: 100px" required=''><br>
-        <button type="submit">Delete Issue</button>
-      </form>
-      <code id='jsonResult'></code>
-    </section>
-    <hr style='margin: 50px; margin-top: 200px'>
-    <!-- Your web-app is https, so your scripts need to be too -->
-    <script src="https://code.jquery.com/jquery-2.2.1.min.js"
-            integrity="sha256-gvQgAFzTH6trSrAWoH1iPo9Xc96QxSZ3feW6kem+O00="
-            crossorigin="anonymous"></script>
-    <script>
-      $(function() {
-        $('#testForm').submit(function(e) {
-          $.ajax({
-            url: '/api/issues/apitest',
-            type: 'post',
-            data: $('#testForm').serialize(),
-            success: function(data) {
-              $('#jsonResult').text(JSON.stringify(data));
-            }
-          });
-          e.preventDefault();
-        });
-        $('#testForm2').submit(function(e) {
-          $.ajax({
-            url: '/api/issues/apitest',
-            type: 'put',
-            data: $('#testForm2').serialize(),
-            success: function(data) {
-              $('#jsonResult').text(JSON.stringify(data));
-            }
-          });
-          e.preventDefault();
-        });
-        $('#testForm3').submit(function(e) {
-          $.ajax({
-            url: '/api/issues/apitest',
-            type: 'delete',
-            data: $('#testForm3').serialize(),
-            success: function(data) {
-              $('#jsonResult').text(JSON.stringify(data));
-            }
-          });
-          e.preventDefault();
-        });
-      });
-   </script>
-  </body>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="description" content="" />
+
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+			integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+			crossorigin="anonymous"
+		/>
+
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"
+		/>
+
+		<style>
+			.bs-callout {
+				margin: 20px 0;
+				padding: 15px 30px 15px 15px;
+				border-left: 5px solid #eee;
+			}
+			.bs-callout h4 {
+				margin-top: 0;
+			}
+			.bs-callout p:last-child {
+				margin-bottom: 0;
+			}
+			.bs-callout code,
+			.bs-callout .highlight {
+				background-color: #fff;
+			}
+
+			/* Themes for different contexts */
+			.bs-callout-danger {
+				background-color: #fcf2f2;
+				border-color: #dfb5b4;
+			}
+			.bs-callout-warning {
+				background-color: #fefbed;
+				border-color: #f1e7bc;
+			}
+			.bs-callout-info {
+				background-color: #f0f7fd;
+				border-color: #d0e3f0;
+			}
+		</style>
+
+		<title>Project Tracker</title>
+	</head>
+	<body>
+		<header></header>
+		<main>
+			<div class="admin-panel container-fluid">
+				<div class="row">
+					<div
+						class="
+							d-flex
+							flex-column flex-shrink-0
+							p-3
+							text-white
+							bg-dark
+							min-vh-100
+						"
+						style="width: 280px"
+					>
+						<a
+							href="/"
+							class="
+								d-flex
+								align-items-center
+								mb-3 mb-md-0
+								me-md-auto
+								text-white text-decoration-none
+							"
+							><i class="bi me-2 bi-kanban-fill" style="font-size: 40px"></i>
+							<span class="fs-4">projecTrack</span>
+						</a>
+						<hr />
+						<ul id="project-list" class="nav nav-pills flex-column"></ul>
+						<button
+							type="button"
+							class="btn btn-primary btn-lg mt-5"
+							data-bs-toggle="modal"
+							data-bs-target="#addNew"
+						>
+						<i class="bi me-2 bi-plus-circle-dotted"></i>
+						New Issue
+						</button>
+						<button
+							type="button"
+							class="btn btn-secondary btn-lg mt-2"
+							data-bs-toggle="modal"
+							data-bs-target="#newProject"
+						>
+						<i class="bi me-2 bi-folder-plus"></i>
+						New Project
+						</button>
+					</div>
+
+					<!-- ADMIN PANEL BELOW-->
+
+					<div class="panel-stats" style="width: calc(100% - 280px)">
+						<div class="row p-5"><h1 id="project-name">Please select project from menu to load data</h1></div>
+						<div class="row p-5">
+							<div class="col-3">
+								<canvas
+									id="myChart"
+									style="min-height: 100px; min-width: 100px; width: 100%"
+								></canvas>
+							</div>
+							<div class="col">
+								<div class="bs-callout bs-callout-warning">
+									<h4>Open Issues: <span id="open-issues">0</span></h4>
+								</div>
+								<div class="bs-callout bs-callout-info">
+									<h4>Closed Issues: <span id="closed-issues">0</span></h4>
+								</div>
+							</div>
+						</div>
+						<div class="row p-4">
+							<div class="col">
+								<div class="card">
+									<div class="card-header">
+								
+
+										<ul
+											class="
+												nav nav-pills
+												card-header-pills
+												justify-content-end
+											"
+										>
+											<li class="nav-item">
+												<a
+													class="nav-link active"
+													data-status="open"
+													aria-current="true"
+													href="#"
+													>Open</a
+												>
+											</li>
+											<li class="nav-item">
+												<a class="nav-link" data-status="closed" href="#"
+													>Closed</a
+												>
+											</li>
+										</ul>
+									</div>
+									<div class="card-body">
+										<div class="list-group">
+											<!-- javascript generated list -->
+										</div>
+									</div>
+									<div class="card-footer">
+										<nav aria-label="Page navigation">
+											<ul
+												class="pagination justify-content-end"
+												id="pagination"
+											></ul>
+										</nav>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+								<!-- New Project Modal -->
+								<div
+								class="modal fade"
+								id="newProject"
+								data-bs-backdrop="static"
+								data-bs-keyboard="false"
+								tabindex="-1"
+								aria-labelledby="staticBackdropLabel"
+								aria-hidden="true"
+							>
+								<div class="modal-dialog">
+									<div class="modal-content">
+										<div class="modal-header">
+											<h5 class="modal-title" id="staticBackdropLabel">
+												New Project
+											</h5>
+											<button
+												type="button"
+												class="btn-close"
+												data-bs-dismiss="modal"
+												aria-label="Close"
+											></button>
+										</div>
+										<form id="NewProjectForm">
+										<div class="modal-body">
+											<div class="mb-3">
+												<label for="page_name" class="form-label">Project Title</label>
+												<input type="text" class="form-control" id="page_name" name="page_name" aria-describedby="projecthelp" required>
+												<div id="projecthelp" class="form-text">Required</div>
+											</div>
+												<div class="mb-3">
+													<label for="issue_title" class="form-label">Issue Title</label>
+													<input type="text" class="form-control" id="issue_title" name="issue_title" aria-describedby="titlehelp" required>
+													<div id="titlehelp" class="form-text">Required</div>
+												</div>
+												<div class="mb-3">
+													<label for="issue_text" class="form-label">Issue Detail</label>
+													<textarea type="text" class="form-control" id="issue_text" aria-describedby="issuetexthelp"
+													name="issue_text" rows="3" required ></textarea>
+													<div id="issuetexthelp" class="form-text">Required</div>
+			
+												</div>
+												<div class="mb-3">
+													<label for="created_by" class="form-label">Created By</label>
+													<input type="text" class="form-control" id="created_by" aria-describedby="creatorhelp" name="created_by" required>
+													<div id="creatorhelp" class="form-text">Required</div>
+												</div>
+												<div class="mb-3">
+													<label for="assigned_to" class="form-label">Assigned To</label>
+													<input type="text" name="assigned_to" class="form-control" id="assigned_to" aria-describedby="assignhelp">
+													<div id="assignhelp" class="form-text">Optional</div>
+												</div>
+												<div class="mb-3">
+													<label for="status_text" class="form-label">Status Text</label>
+													<input type="text" class="form-control" name="status_text" id="status_text" aria-describedby="statushelp">
+													<div id="statushelp" class="form-text">Optional</div>
+												</div>
+			
+										</div>
+										<div class="modal-footer">
+											<button
+												type="button"
+												class="btn btn-secondary"
+												data-bs-dismiss="modal"
+											>
+												Close
+											</button>
+											<button type="submit" class="btn btn-primary" id="submitNewProject">Submit</button>
+										</form>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							
+				<!-- New Issue Modal -->
+				<div
+					class="modal fade"
+					id="addNew"
+					data-bs-backdrop="static"
+					data-bs-keyboard="false"
+					tabindex="-1"
+					aria-labelledby="staticBackdropLabel"
+					aria-hidden="true"
+				>
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="staticBackdropLabel">
+									Add New Issue
+								</h5>
+								<button
+									type="button"
+									class="btn-close"
+									data-bs-dismiss="modal"
+									aria-label="Close"
+								></button>
+							</div>
+              <form id="NewIssueForm">
+							<div class="modal-body">
+                
+                
+                  <div class="mb-3">
+                    <label for="issue_title" class="form-label">Issue Title</label>
+                    <input type="text" class="form-control" id="issue_title" name="issue_title" aria-describedby="titlehelp" required>
+                    <div id="titlehelp" class="form-text">Required</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="issue_text" class="form-label">Issue Detail</label>
+                    <textarea type="text" class="form-control" id="issue_text" aria-describedby="issuetexthelp"
+                    name="issue_text" rows="3" required ></textarea>
+                    <div id="issuetexthelp" class="form-text">Required</div>
+
+                  </div>
+                  <div class="mb-3">
+                    <label for="created_by" class="form-label">Created By</label>
+                    <input type="text" class="form-control" id="created_by" aria-describedby="creatorhelp" name="created_by" required>
+                    <div id="creatorhelp" class="form-text">Required</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="assigned_to" class="form-label">Assigned To</label>
+                    <input type="text" name="assigned_to" class="form-control" id="assigned_to" aria-describedby="assignhelp">
+                    <div id="assignhelp" class="form-text">Optional</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="status_text" class="form-label">Status Text</label>
+                    <input type="text" class="form-control" name="status_text" id="status_text" aria-describedby="statushelp">
+                    <div id="statushelp" class="form-text">Optional</div>
+                  </div>
+ 
+                  
+
+              </div>
+							<div class="modal-footer">
+								<button
+									type="button"
+									class="btn btn-secondary"
+									data-bs-dismiss="modal"
+								>
+									Close
+								</button>
+								<button type="submit" class="btn btn-primary" id="submitNewIssue">Submit</button>
+              </form>
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+				<!-- Update Issue Modal -->
+				<div
+					class="modal fade"
+					id="updateModal"
+					data-bs-backdrop="static"
+					data-bs-keyboard="false"
+					tabindex="-1"
+					aria-labelledby="staticBackdropLabel"
+					aria-hidden="true"
+				>
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="staticBackdropLabel">
+									Update Issue
+								</h5>
+								<button
+									type="button"
+									class="btn-close"
+									data-bs-dismiss="modal"
+									aria-label="Close"
+								></button>
+							</div>
+              <form id="UpdateIssueForm">
+								<input type="hidden" id="update_projectid" name="_id" value="">
+							<div class="modal-body">
+                
+                
+                  <div class="mb-3">
+                    <label for="issue_title" class="form-label">Issue Title</label>
+                    <input type="text" class="form-control" id="update_issue_title" name="issue_title" aria-describedby="titlehelp" required>
+                    <div id="titlehelp" class="form-text">Required</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="issue_text" class="form-label">Issue Detail</label>
+                    <textarea type="text" class="form-control" id="update_issue_text" aria-describedby="issuetexthelp"
+                    name="issue_text" rows="3" required ></textarea>
+                    <div id="issuetexthelp" class="form-text">Required</div>
+
+                  </div>
+
+									<div class="mb-3">
+                    <label for="assigned_to" class="form-label">Created By</label>
+                    <input type="text" name="assigned_to" class="form-control" id="update_created_by" disabled readonly>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label for="assigned_to" class="form-label">Assigned To</label>
+                    <input type="text" name="assigned_to" class="form-control" id="update_assigned_to" aria-describedby="assignhelp">
+                    <div id="assignhelp" class="form-text">Optional</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="status_text" class="form-label">Status Text</label>
+                    <input type="text" class="form-control" name="status_text" id="update_status_text" aria-describedby="statushelp">
+                    <div id="statushelp" class="form-text">Optional</div>
+                  </div>
+                  <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" name="open" id="update_open">
+                    <label class="form-check-label" for="update_open">Close Issue</label>
+                  </div>
+                  
+
+              </div>
+							<div class="modal-footer">
+								<button
+									type="button"
+									class="btn btn-secondary"
+									data-bs-dismiss="modal"
+								>
+									Close
+								</button>
+								<button type="button" class="btn btn-danger" id="deleteIssue">Delete Issue</button>
+								<button type="submit" class="btn btn-primary" id="submitUpdateButton">Submit</button>
+              </form>
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+			</div>
+		</main>
+		<footer></footer>
+		<!-- <script src="scripts.js"></script> -->
+		<script
+			src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+			integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+			crossorigin="anonymous"
+		></script>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.4.1/chart.min.js"></script>
+		<script>
+			// Get project name from end of URL
+			const thisPageUrl =
+				window.location.pathname.slice(-1) == "/"
+					? window.location.pathname.slice(0, -1)
+					: window.location.pathname;
+			let project = thisPageUrl.split("/").slice(-1).toString();
+
+			// User set variables:
+			let isOpen = true; // Set to view only open 'true' or closed 'false'
+			const limit = 5; // Set limit of issues per page
+			let currentPage = 1; // Which page
+			let totalPages = 1;
+			let filteredIssues = []; // Store all issues here
+			let currentOpen = 0;
+			let currentClosed = 0;
+			let projectList = [];
+			// Load the correct API route to retreive JSON object of project issues
+			const dataUrl = "http://localhost:3000/api/";
+
+			function displayProjectNames() {
+				const container = document.getElementById("project-list");
+				container.innerHTML = "";
+
+				// Map through issues and add to web page
+				// Filter: display relevant issues for current page only
+				projectList.map((issue) => {
+					let item = document.createElement("li");
+					item.className = "nav-item";
+					item.innerHTML = `<a href="../../${issue}" class="nav-link text-white">
+            <i class="bi me-2 bi-arrow-right-short"></i>
+
+									${issue}
+								</a>`;
+					container.append(item);
+				});
+			}
+			function displayIssues() {
+				const container = document.querySelector(".list-group");
+				container.innerHTML = "";
+
+				// Map through issues and add to web page
+				// Filter: display relevant issues for current page only
+				filteredIssues
+					.filter(
+						(issue, i) =>
+							i >= currentPage * limit - limit && i < currentPage * limit
+					)
+					.map((issue) => {
+						let item = document.createElement("a");
+						let dateNow = Date.now;
+						item.href = `../../${project}/issues/${issue._id}`;
+						item.setAttribute("data-bs-toggle","modal")
+						item.setAttribute("data-bs-target","#updateModal")
+						item.setAttribute("data-projectid",issue._id)
+						item.className = "list-group-item list-group-item-action";
+						item.innerHTML = `<div class="d-flex w-100 justify-content-between">
+						<h5 class="mb-1">${issue.issue_title}</h5>
+						<small class="text-muted">Updated ${timeSinceUpdate(issue.updated_on)}</small>
+					</div>
+					<p class="mb-1">${issue.issue_text}</p>
+					<small class="text-muted">Status: ${issue.status_text}</small>`;
+					item.addEventListener("click", loadProjectDetails)
+						container.append(item);
+					});
+
+				// Create pagination
+				let i = 1;
+				let paginationContainer = document.getElementById("pagination");
+				paginationContainer.innerHTML = "";
+				let prevLi = document.createElement("li");
+				let nextLi = document.createElement("li");
+
+				prevLi.className = `page-item ${currentPage === 1 ? "disabled" : ""}`;
+				prevLi.innerHTML = `
+						<a class="page-link" href="#" ${
+							currentPage === 1 ? 'tabindex="-1" aria-disabled="true"' : ""
+						} id="prev-link"
+							>Previous</a
+						>
+			       `;
+
+				nextLi.className = `page-item ${
+					currentPage === totalPages ? "disabled" : ""
+				}`;
+				nextLi.innerHTML = `
+						<a class="page-link" href="#" ${
+							currentPage === totalPages
+								? 'tabindex="-1" aria-disabled="true"'
+								: ""
+						} id="next-link">Next</a>
+			       `;
+
+				while (i <= totalPages) {
+					let li = document.createElement("li");
+					li.className = `page-item ${currentPage === i ? "active" : ""}`;
+					li.innerHTML = `<a class="page-link page-number" href="#">${i}</a>`;
+
+					i === 1 ? paginationContainer.append(prevLi) : "";
+					paginationContainer.append(li);
+					i === totalPages ? paginationContainer.append(nextLi) : "";
+
+					i++;
+				}
+				let pagelinks = document.getElementsByClassName("page-number");
+				for (let i = 0; i < pagelinks.length; i++) {
+					pagelinks[i].addEventListener("click", function (e) {
+						e.preventDefault();
+						currentPage = parseInt(this.text);
+						displayIssues();
+					});
+				}
+				document
+					.getElementById("next-link")
+					.addEventListener("click", function (e) {
+						e.preventDefault();
+						currentPage++;
+						fetchIssues();
+						// alert(currentPage);
+					});
+				document
+					.getElementById("prev-link")
+					.addEventListener("click", function (e) {
+						e.preventDefault();
+						currentPage--;
+						fetchIssues();
+						// alert(currentPage);
+					});
+			}
+			async function fetchIssues() {
+				// Below variables required for functionality
+				const response = await fetch(dataUrl  +"issues/"+ project);
+				const issues = await response.json();
+				currentOpen = issues.filter((issue) => issue.open === true).length;
+				currentClosed = issues.filter((issue) => issue.open === false).length;
+				filteredIssues = issues.filter((issue, i) => issue.open == isOpen);
+
+				totalPages = Math.ceil(filteredIssues.length / limit);
+
+				displayIssues();
+				renderChart();
+				document.getElementById("project-name").innerHTML = '<i class="bi me-2 bi-folder2-open"></i>' + project
+			}
+
+			fetchIssues();
+
+			async function fetchProjectNames() {
+				// Below variables required for functionality
+				const response = await fetch(dataUrl +"projects/");
+				const names = await response.json();
+				for (let i = 0; i < names.length; i++) {
+						projectList.push(names[i]);
+				}
+
+				displayProjectNames();
+			}
+
+			fetchProjectNames();
+
+			let navlink = document.getElementsByClassName("nav-link");
+
+			function toggleActiveClass(e) {
+				for (let i = 0; i < navlink.length; i++) {
+					navlink[i].classList.remove("active");
+					e.target.classList.add("active");
+				}
+			}
+
+			function enableSelectors() {
+				for (let i = 0; i < navlink.length; i++) {
+					navlink[i].addEventListener("click", function (e) {
+						e.preventDefault();
+						buttonIsOpen =
+							this.getAttribute("data-status") === "open" ? true : false;
+						isOpen = buttonIsOpen;
+
+						console.log(isOpen);
+						currentPage = 1;
+
+						toggleActiveClass(e);
+
+						fetchIssues();
+					});
+				}
+			}
+			enableSelectors();
+			// Reusable function: Format 'updated on' to show clean output i.e. "Updated 4 hours ago"
+			function timeSinceUpdate(updated_on) {
+				let hours = Math.round(
+					(Date.now() - Date.parse(updated_on)) / 1000 / 60 / 60
+				);
+				let days = Math.round(hours / 24);
+
+				if (hours == 0) {
+					return "just now";
+				} else if (hours >= 1 && hours < 24) {
+					return hours + ` hour${hours > 1 ? "s" : ""} ago`;
+				} else {
+					return days + ` day${days > 1 ? "s" : ""} ago`;
+				}
+			}
+
+			// CHART JS//
+			function renderChart() {
+				document.getElementById("open-issues").innerText = currentOpen;
+				document.getElementById("closed-issues").innerText = currentClosed;
+				var xValues = ["Open", "Closed"];
+				var yValues = [currentOpen, currentClosed];
+				var barColors = ["#b91d47", "#00aba9"];
+
+				new Chart("myChart", {
+					type: "pie",
+					data: {
+						labels: xValues,
+						datasets: [
+							{
+								backgroundColor: barColors,
+								data: yValues,
+							},
+						],
+					},
+					options: {
+						title: {
+							display: true,
+							text: "Project Issues Status",
+						},
+					},
+				});
+			}
+
+      ////  Post New Issue
+  function sendNewIssue(data, method, redirect) {
+    const XHR = new XMLHttpRequest();
+    XHR.addEventListener( "load", function(event) {
+      alert( event.target.responseText );
+    } );
+    XHR.addEventListener( "error", function( event ) {
+      alert( 'Oops! Something went wrong.' );
+    } );
+    XHR.open( method, `/api/issues/${project}` );
+		XHR.setRequestHeader("Content-Type", "application/json");
+    XHR.send( data );
+		if(redirect === "changeView"){
+			window.location.replace(`/${project}`);
+
+		}else{
+			location.reload();
+		}	
+  }
+  // Access the form element...
+  const NewIssueForm = document.getElementById( "NewIssueForm" );
+
+  // ...and take over its submit event.
+  NewIssueForm.addEventListener( "submit", function ( event ) {
+    event.preventDefault();
+
+    sendNewIssue(toJSONString(NewIssueForm), "POST");
+  } );
+
+	 // Access the form element...
+	const NewProjectForm = document.getElementById( "NewProjectForm" );
+
+// ...and take over its submit event.
+NewProjectForm.addEventListener( "submit", function ( event ) {
+	event.preventDefault();
+	
+project = document.getElementById("page_name").value
+console.log("test", project)
+	sendNewIssue(toJSONString(NewProjectForm), "POST", "changeView");
+} );
+
+ // Access the form element...
+const UpdateIssueForm = document.getElementById( "UpdateIssueForm" );
+
+// ...and take over its submit event.
+UpdateIssueForm.addEventListener( "submit", function ( event ) {
+	event.preventDefault();
+
+	sendNewIssue(toJSONString(UpdateIssueForm), "PUT");
+} );
+
+// Access the form element...
+const DeleteIssueButton = document.getElementById( "deleteIssue" );
+
+// ...and take over its submit event.
+DeleteIssueButton.addEventListener( "click", function ( event ) {
+	event.preventDefault();
+
+	sendNewIssue(toJSONString(UpdateIssueForm), "DELETE");
+} );
+
+
+//convert formdata to JSON string
+function toJSONString( form ) {
+		let JSONobject = {};
+		let formFields = form.querySelectorAll( "input, select, textarea" );
+		for( let i = 0; i < formFields.length; ++i ) {
+			let formField = formFields[i];
+			let nameAttr = formField.name;
+			let value = formField.value;
+			
+			if( nameAttr ) {
+				JSONobject[ nameAttr ] = value;
+			}
+		}
+
+		return JSON.stringify( JSONobject );
+		// return JSONobject
+	}
+
+	function loadProjectDetails(e) {
+
+	
+	selectedProjectId = filteredIssues.findIndex(x => x._id ===this.dataset.projectid)
+	
+	document.getElementById("update_projectid").value = this.dataset.projectid
+	document.getElementById("update_issue_title").value = filteredIssues[selectedProjectId].issue_title
+	document.getElementById("update_issue_text").value = filteredIssues[selectedProjectId].issue_text
+	document.getElementById("update_created_by").value = !filteredIssues[selectedProjectId].created_by?"":filteredIssues[selectedProjectId].created_by
+	document.getElementById("update_assigned_to").value = !filteredIssues[selectedProjectId].assigned_to?"":filteredIssues[selectedProjectId].assigned_to
+	document.getElementById("update_status_text").value = !filteredIssues[selectedProjectId].status_text?"":filteredIssues[selectedProjectId].status_text
+	document.getElementById("update_open").value = !filteredIssues[selectedProjectId].open
+	document.getElementById("update_open").checked = !filteredIssues[selectedProjectId].open
+
+		e.preventDefault();
+						
+	}
+
+		</script>
+	</body>
 </html>
