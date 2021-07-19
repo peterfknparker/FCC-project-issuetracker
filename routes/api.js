@@ -152,16 +152,13 @@ module.exports = function (app, dataBase) {
 			if (!_id) {
 				return res.json({ error: "missing _id" });
 			} else {
-				Issue.find(
-					{ project_name: project, _id: req.body._id },
-					function (err, deleted) {
-						if (!err && deleted) {
-							return res.json({ result: "successfully deleted", _id: _id });
-						} else if (!deleted) {
-							return res.json({ error: "could not delete", _id: _id });
-						}
+				Issue.findByIdAndRemove({ _id: _id }, function (err, deleted) {
+					if (!err && deleted) {
+						return res.json({ result: "successfully deleted", _id: _id });
+					} else if (!deleted) {
+						return res.json({ error: "could not delete", _id: _id });
 					}
-				);
+				});
 			}
 		});
 };
