@@ -643,7 +643,9 @@
   function sendNewIssue(data, method, redirect) {
     const XHR = new XMLHttpRequest();
     XHR.addEventListener( "load", function(event) {
-      alert( event.target.responseText );
+			location.reload();
+
+      // alert( event.target.responseText );
     } );
     XHR.addEventListener( "error", function( event ) {
       alert( 'Oops! Something went wrong.' );
