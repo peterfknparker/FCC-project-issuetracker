@@ -163,7 +163,7 @@ module.exports = function (app, dataBase) {
 						}
 					);
 				} catch {
-					return res.json({ error: "could not update", _id: _id });
+					return res.json({ error: "could not delete", _id: _id });
 				}
 			}
 		});

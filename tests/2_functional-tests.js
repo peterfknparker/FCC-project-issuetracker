@@ -167,7 +167,10 @@ suite("Functional Tests", function () {
 				})
 				.end(function (err, res) {
 					assert.equal(res.type, "application/json", "json");
-					assert.equal(res.body.result, "successfully updated");
+					assert.deepEqual(res.body, {
+						result: "successfully updated",
+						_id: firstIssueId,
+					});
 				});
 			done();
 		});
@@ -183,7 +186,10 @@ suite("Functional Tests", function () {
 				})
 				.end(function (err, res) {
 					assert.equal(res.type, "application/json", "json");
-					assert.equal(res.body.result, "successfully updated");
+					assert.deepEqual(res.body, {
+						result: "successfully updated",
+						_id: firstIssueId,
+					});
 				});
 			done();
 		});
