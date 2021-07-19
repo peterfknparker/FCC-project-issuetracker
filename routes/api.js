@@ -36,27 +36,31 @@ module.exports = function (app, dataBase) {
 		.post(function (req, res) {
 			let project = req.params.project;
 
+			let {
+				issue_title,
+				issue_text,
+				created_by,
+				assigned_to,
+				status_text,
+				open,
+			} = req.body;
+
 			// 1. You can send a POST request to `/api/issues/{projectname}` with form data containing the required fields issue_title, issue_text, created_by, and optionally assigned_to and status_text.
 
 			let newIssue;
 
 			// 3. If you send a POST request to `/api/issues/{projectname}` without the required fields, returned will be the error `{ error: 'required field(s) missing' }`
-			if (
-				!req.body.issue_title ||
-				!req.body.issue_text ||
-				!req.body.created_by ||
-				!project
-			) {
+			if (!issue_title || !issue_text || !created_by || !project) {
 				res.json({ error: "required field(s) missing" });
 			} else {
 				newIssue = new Issue({
 					project_name: project,
-					issue_title: req.body.issue_title,
-					issue_text: req.body.issue_text,
-					created_by: req.body.created_by,
-					assigned_to: req.body.assigned_to,
-					open: req.body.open,
-					status_text: req.body.status_text,
+					issue_title: issue_title,
+					issue_text: issue_text,
+					created_by: created_by,
+					assigned_to: assigned_to,
+					open: open,
+					status_text: status_text,
 				});
 				newIssue.save(function (err, issue) {
 					// 2. The POST request to `/api/issues/{projectname}` will return the created object, and must include all of the submitted fields. Excluded optional fields will be returned as empty strings. Additionally, include created_on `(date/time)`, updated_on `(date/time)`, open `(boolean, true for open - default value, false for closed)`, and \_id.
@@ -102,7 +106,6 @@ module.exports = function (app, dataBase) {
 
 			// 7. When the PUT request sent to `/api/issues/{projectname}` does not include an \_id, the return value is `{ error: 'missing _id' }`.
 
-			console.log("idcheck", _id);
 			if (!_id) {
 				return res.json({ error: "missing _id" });
 			} else if (
@@ -117,31 +120,22 @@ module.exports = function (app, dataBase) {
 
 				return res.json({ error: "no update field(s) sent", _id: _id });
 			} else {
-				console.log("Step 1");
-				// let _checkId;
-				try {
-					_id = mongoose.Types.ObjectId(_id);
-					console.log(_id);
-
-					console.log(_id, updatedIssue);
-					Issue.findByIdAndUpdate(
-						_id,
-						updatedIssue,
-						{ new: true },
-						function (err, issue) {
-							if (err) return res.json({ error: "could not update", _id: _id });
-							// 6. You can send a PUT request to `/api/issues/{projectname}` with an \_id and one or more fields to update. On success, the updated_on field should be updated, and returned should be `{ result: 'successfully updated', '_id': _id }`.
+				Issue.findByIdAndUpdate(
+					_id,
+					updatedIssue,
+					{ new: true },
+					function (err, updated) {
+						if (!err && updated) {
 							return res.json({
 								result: "successfully updated",
 								_id: _id,
 							});
+						} else if (!updated) {
+							return res.json({ error: "could not update", _id: _id });
 						}
-					);
-				} catch (err) {
-					// return res.json({ error: "could not update", _id: _id });
-					console.log(err);
-					return res.json({ error: "could not update", _id: _id });
-				}
+						// 6. You can send a PUT request to `/api/issues/{projectname}` with an \_id and one or more fields to update. On success, the updated_on field should be updated, and returned should be `{ result: 'successfully updated', '_id': _id }`.
+					}
+				);
 			}
 		})
 
