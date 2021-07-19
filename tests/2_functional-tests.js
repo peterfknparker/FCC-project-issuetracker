@@ -238,20 +238,20 @@ suite("Functional Tests", function () {
 	//DELETE AN ISSUE
 	/////////////////////////////////////////////////////////////////////////
 	suite("Delete an issue", function () {
-		// test("12. Delete an issue: DELETE request to /api/issues/{project}", function (done) {
-		// 	chai
-		// 		.request(server)
-		// 		.delete("/api/issues/functionaltests")
-		// 		.send({
-		// 			_id: firstIssueId,
-		// 		})
-		// 		.end(function (err, res) {
-		// 			assert.equal(res.type, "application/json", "json");
-		// 			assert.equal(res.body.result, "successfully deleted");
-		// 			assert.equal(res.body._id, firstIssueId);
-		// 		});
-		// 	done();
-		// });
+		test("12. Delete an issue: DELETE request to /api/issues/{project}", function (done) {
+			chai
+				.request(server)
+				.delete("/api/issues/functionaltests")
+				.send({
+					_id: firstIssueId,
+				})
+				.end(function (err, res) {
+					assert.equal(res.type, "application/json", "json");
+					assert.equal(res.body.result, "successfully deleted");
+					assert.equal(res.body._id, firstIssueId);
+				});
+			done();
+		});
 
 		test("13. Delete an issue with an invalid _id: DELETE request to /api/issues/{project}", function (done) {
 			chai
