@@ -150,7 +150,7 @@ module.exports = function (app, dataBase) {
 			let project = req.params.project;
 			let { _id } = req.body;
 			if (!_id) {
-				res.json({ error: "missing _id" });
+				return res.json({ error: "missing _id" });
 			} else {
 				try {
 					_id = mongoose.Types.ObjectId(_id);
@@ -159,10 +159,12 @@ module.exports = function (app, dataBase) {
 						{ project_name: project, _id: req.body._id },
 						function (err, issue) {
 							if (err) return res.json({ error: "could not delete", _id: _id });
-							res.json({ result: "successfully deleted", _id: _id });
+							return res.json({ result: "successfully deleted", _id: _id });
 						}
 					);
-				} catch {}
+				} catch {
+					return res.json({ error: "could not update", _id: _id });
+				}
 			}
 		});
 };
