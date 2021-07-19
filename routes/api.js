@@ -130,21 +130,17 @@ module.exports = function (app, dataBase) {
 		// 9. You can send a DELETE request to `/api/issues/{projectname}` with an \_id to delete an issue. If no \_id is sent, the return value is `{ error: 'missing _id' }`. On success, the return value is `{ result: 'successfully deleted', '_id': _id }`. On failure, the return value is `{ error: 'could not delete', '_id': _id }`.
 		.delete(function (req, res) {
 			let project = req.params.project;
-
 			if (!req.body._id) {
 				res.json({ error: "missing _id" });
 			} else {
-				let id;
-				try {
-					id = mongoose.Types.ObjectId(req.body._id);
-				} catch (err) {
-					return res.json({ error: "could not delete", _id: req.body._id });
-				}
-				Issue.find({ project_name: project, _id: id }, function (err, issue) {
-					if (err)
-						return res.json({ error: "could not delete", _id: req.body._id });
-					res.json({ result: "successfully deleted", _id: req.body._id });
-				});
+				Issue.find(
+					{ project_name: project, _id: req.body._id },
+					function (err, issue) {
+						if (err)
+							return res.json({ error: "could not delete", _id: req.body._id });
+						res.json({ result: "successfully deleted", _id: req.body._id });
+					}
+				);
 			}
 		});
 };
