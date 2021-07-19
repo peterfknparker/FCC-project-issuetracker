@@ -247,8 +247,10 @@ suite("Functional Tests", function () {
 				})
 				.end(function (err, res) {
 					assert.equal(res.type, "application/json", "json");
-					assert.equal(res.body.result, "successfully deleted");
-					assert.equal(res.body._id, firstIssueId);
+					assert.deepEqual(res.body, {
+						result: "successfully deleted",
+						_id: firstIssueId,
+					});
 				});
 			done();
 		});
@@ -262,8 +264,10 @@ suite("Functional Tests", function () {
 				})
 				.end(function (err, res) {
 					assert.equal(res.type, "application/json", "json");
-					assert.equal(res.body.error, "could not delete");
-					assert.equal(res.body._id, "foobar");
+					assert.deepEqual(res.body, {
+						error: "could not delete",
+						_id: "foobar",
+					});
 				});
 			done();
 		});
@@ -277,7 +281,7 @@ suite("Functional Tests", function () {
 				})
 				.end(function (err, res) {
 					assert.equal(res.type, "application/json", "json");
-					assert.equal(res.body.error, "missing _id");
+					assert.deepEqual(res.body, { error: "missing _id" });
 				});
 			done();
 		});
