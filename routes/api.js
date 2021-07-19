@@ -91,6 +91,7 @@ module.exports = function (app, dataBase) {
 			}
 
 			// 7. When the PUT request sent to `/api/issues/{projectname}` does not include an \_id, the return value is `{ error: 'missing _id' }`.
+
 			if (!req.body._id) {
 				res.json({ error: "missing _id" });
 			} else if (
@@ -103,16 +104,17 @@ module.exports = function (app, dataBase) {
 			) {
 				// 8. When the PUT request sent to `/api/issues/{projectname}` does not include update fields, the return value is `{ error: 'no update field(s) sent', '_id': _id }`. On any other error, the return value is `{ error: 'could not update', '_id': _id }`.
 
+				res.json({ error: "no update field(s) sent", _id: req.body._id });
+			} else {
+				let id;
 				try {
-					id = mongoose.Types.ObjectId(id);
+					id = mongoose.Types.ObjectId(req.body._id);
 				} catch (err) {
 					return res.json({ error: "could not update", _id: req.body._id });
 				}
 
-				res.json({ error: "no update field(s) sent", _id: req.body._id });
-			} else {
 				Issue.findByIdAndUpdate(
-					req.body._id,
+					id,
 					updatedIssue,
 					{ new: true },
 					function (err, issue) {
